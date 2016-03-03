@@ -8,3 +8,6 @@
    browser/default-opts
    result-cb
    user-str))
+
+(defn get-prompt []
+  (replumb/get-prompt))

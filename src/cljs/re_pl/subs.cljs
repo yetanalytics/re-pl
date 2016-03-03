@@ -7,6 +7,10 @@
  (fn [db]
    (reaction (:name @db))))
 
+(re-frame/register-sub
+ :prompt
+ (fn [db]
+   (reaction (:prompt @db "loading..."))))
 
 (re-frame/register-sub
  :results
@@ -17,6 +21,12 @@
  :buffer
  (fn [db]
    (reaction (:buffer @db))))
+
+(re-frame/register-sub
+ :history-position
+ (fn [db]
+   (reaction (:history-position @db))))
+
 
 
 (re-frame/register-sub
