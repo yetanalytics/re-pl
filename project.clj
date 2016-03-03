@@ -1,17 +1,25 @@
 (defproject re-pl "0.1.0-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.170"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojurescript "1.7.228"]
                  [reagent "0.5.1"]
-                 [re-frame "0.6.0"]]
+                 [re-frame "0.6.0"]
+                 [replumb "0.1.5-3"]
+                 [cljsjs/highlight "8.4-0"]]
 
   :min-lein-version "2.5.3"
 
-  :source-paths ["src/clj"]
+  :source-paths ["src/clj" "src/cljs"]
 
-  :plugins [[lein-cljsbuild "1.1.1"]
-            [lein-figwheel "0.5.0-2"]]
+  :plugins [[lein-cljsbuild "1.1.2" :exclusions [[org.clojure/clojure]]]
+            [lein-figwheel "0.5.0-6"]]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
+
+  :profiles {:dev {:source-paths ["src/clj" "src/cljs" "dev"]
+                   :dependencies [[figwheel-sidecar "0.5.0-6"]
+                                  [com.cemerick/piggieback "0.2.1"]]
+                   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+                   }}
 
   :figwheel {:css-dirs ["resources/public/css"]}
 
@@ -28,6 +36,6 @@
                         :source-paths ["src/cljs"]
                         :compiler {:main re-pl.core
                                    :output-to "resources/public/js/compiled/app.js"
-                                   :optimizations :advanced
+                                   :optimizations :simple
                                    :closure-defines {goog.DEBUG false}
                                    :pretty-print false}}]})
