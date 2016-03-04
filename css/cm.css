@@ -1,0 +1,8 @@
+.CodeMirror {
+  height: auto;
+}
+
+.cm-no-pad .CodeMirror-lines {
+  padding-top: 0;
+  padding-bottom: 0;
+}
