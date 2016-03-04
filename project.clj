@@ -4,7 +4,8 @@
                  [reagent "0.5.1"]
                  [re-frame "0.6.0"]
                  [replumb "0.1.5-3"]
-                 [cljsjs/highlight "8.4-0"]]
+                 [cljsjs/codemirror "5.11.0-1"]
+                 ]
 
   :min-lein-version "2.5.3"
 
