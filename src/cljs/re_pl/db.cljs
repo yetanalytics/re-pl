@@ -1,9 +1,7 @@
 (ns re-pl.db)
 
 (def default-db
-  {:name "re-frame"
-   :scratch "" ;; un-evaluated repl input
+  {:scratch "" ;; un-evaluated repl input
    :results-data (list) ;; raw repl output
-   :buffer "" ;; string containing buffer as text
-   :history-position 0 ;; position in history
-})
+   :buffer ";; Welcome to re-pl!" ;; string containing buffer as text
+   })

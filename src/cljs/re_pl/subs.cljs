@@ -3,11 +3,6 @@
     (:require [re-frame.core :as re-frame]))
 
 (re-frame/register-sub
- :name
- (fn [db]
-   (reaction (:name @db))))
-
-(re-frame/register-sub
  :prompt
  (fn [db]
    (reaction (:prompt @db "loading..."))))
@@ -21,12 +16,6 @@
  :buffer
  (fn [db]
    (reaction (:buffer @db))))
-
-(re-frame/register-sub
- :history-position
- (fn [db]
-   (reaction (:history-position @db))))
-
 
 
 (re-frame/register-sub
