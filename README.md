@@ -1,6 +1,8 @@
 # re-pl
 
-A [re-frame](https://github.com/Day8/re-frame) application designed to ... well, that part is up to you.
+A toy [re-frame](https://github.com/Day8/re-frame) application that presents the user with a [bootstrapped cljs](https://github.com/clojure/clojurescript/wiki/Bootstrapping-the-Compiler) repl.
+
+Uses [re-plumb](https://github.com/Lambda-X/replumb) to make read/eval super easy, and [CodeMirror](https://codemirror.net/) for editing/highlighting.
 
 ## Development Mode
 
