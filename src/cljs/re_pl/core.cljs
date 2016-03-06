@@ -24,4 +24,5 @@
 (defn ^:export init []
   (re-frame/dispatch-sync [:initialize-db])
   (re-frame/dispatch [:update-prompt!])
+  (re-frame/dispatch [:console/prompt!])
   (mount-root))
