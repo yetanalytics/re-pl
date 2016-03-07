@@ -63,6 +63,15 @@
                     :extraKeys {:Enter
                                 #(re-frame/dispatch [:console/read-prompt])}}
                    opts)))]
+         (do
+           (set! *print-newline* false)
+           (set! *print-fn*
+                 (fn [& args]
+                   (re-frame/dispatch [:console/print (apply str args)])))
+           (set! *print-err-fn*
+                 (fn [& args]
+                   (re-frame/dispatch [:console/print (apply str args)])))
+           )
          (assoc db :console cm))))))
 
 (re-frame/register-handler
@@ -107,22 +116,19 @@
        db)
      (throw (js/Error. "No console!")))))
 
-(comment
-  (defn enable-console-print!
-  "Set *print-fn* to console.log"
-  []
-  (set! *print-newline* false)
-  (set! *print-fn*
-        (fn [& args]
-          (.apply (.-log js/console) js/console (into-array args))))
-  (set! *print-err-fn*
-        (fn [& args]
-          (.apply (.-error js/console) js/console (into-array args))))
-  nil))
-
+;
 (re-frame/register-handler
  :console/print
- (fn [db [_ message]]
+ (fn [{:keys [console state] :as db} [_ message]]
+   (when console
+     (let [last-line (.lastLine console)]
+       (.replaceRange console
+                      (str "\n" message)
+                      #js {:line (inc last-line)
+                           :ch 0})
+       (when (#{:init :input} state)
+         (re-frame/dispatch [:console/prompt! true ;; force a newline
+                             ]))))
    db))
 
 
@@ -139,14 +145,13 @@
          #js {:line last-line}
          #js {:className "re-pl-buffer"
               :readOnly true}))))
-
+;
 (re-frame/register-handler
  :console/prompt!
- (fn [{:keys [console prompt state] :as db} _]
+ (fn [{:keys [console prompt state] :as db} [_ ?force-newline]]
    (if (and console prompt)
      (let [last-line (.lastLine console)
-           line-count (.lineCount console)
-           after-eval? (= :eval state) ;; will be true if this isn't the first prompt
+           new-line? (or (= :eval state) ?force-newline) ;; will be true if this isn't the first prompt
            ;; escaped-prompt (str prompt space)
            ]
        (doto console
@@ -154,12 +159,12 @@
          clear-marks!
 
          ;; if there is a buffer, make it read-only
-         (cond-> after-eval? mark-buffer)
+         (cond-> new-line? mark-buffer)
 
          ;; add the prompt
          (.replaceRange
           (str
-           (when after-eval?
+           (when new-line?
              "\n")
            prompt)
           #js {:line last-line}) ;; no ch means EOL
@@ -167,10 +172,10 @@
          ;; mark prompt
          (.markText
           #js {:line (cond-> last-line
-                       after-eval? inc)
+                       new-line? inc)
                :ch 0}
           #js {:line (cond-> last-line
-                       after-eval? inc)
+                       new-line? inc)
                :ch (count prompt)}
           #js {:className "re-pl-prompt"
                :readOnly true})
@@ -178,10 +183,10 @@
          ;; mark input, this will be the last mark
          (.markText
           #js {:line (cond-> last-line
-                       after-eval? inc)
+                       new-line? inc)
                :ch (inc (count prompt))}
           #js {:line (inc (cond-> last-line
-                       after-eval? inc))}
+                       new-line? inc))}
           #js {:className "re-pl-input"
                :clearWhenEmpty false
                :inclusiveLeft true
@@ -189,7 +194,7 @@
 
          ;; set the cursor to eol
          (.setCursor #js {:line (cond-> last-line
-                                  after-eval? inc)}))
+                                  new-line? inc)}))
 
        ;; set the app state to input
        (assoc db :state :input))
