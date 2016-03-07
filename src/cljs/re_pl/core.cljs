@@ -6,7 +6,7 @@
 
    cljsjs.codemirror.addon.edit.closebrackets
    cljsjs.codemirror.addon.edit.matchbrackets
-
+   datascript.core
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]
    [re-pl.handlers]
