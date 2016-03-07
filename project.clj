@@ -5,7 +5,7 @@
                  [re-frame "0.6.0"]
                  [replumb "0.1.5-3"]
                  [cljsjs/codemirror "5.11.0-1"]
-                 ]
+                 [datascript "0.15.0"]]
 
   :min-lein-version "2.5.3"
 
