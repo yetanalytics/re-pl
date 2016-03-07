@@ -22,9 +22,9 @@
  (fn [{:keys [prompt console] :as db} [_ {:keys [value form error warning] :as result}]]
 
    (when console
-     ;; (re-frame/dispatch [:console/write-line (str "\n" prompt form)])
-     (when warning (re-frame/dispatch [:console/write-line (str warning)]))
-     (re-frame/dispatch [:console/write-line (str (or value error))])
+     (when warning
+       (re-frame/dispatch [:console/write (str "\n" warning)]))
+     (re-frame/dispatch [:console/write (str "\n" (or value error))])
      (re-frame/dispatch
       [:console/prompt!]))
 
@@ -39,14 +39,7 @@
    (read-eval-call
     #(re-frame/dispatch [:store-result %])
     input-str)
-   (-> db
-       (assoc :state :eval)
-       ;; update the buffer count if there are extra line breaks
-       (update :buffer-lines + (-> input-str
-                                   str/split-lines
-                                   count
-                                   dec)))))
-
+   (assoc db :state :eval)))
 
 ;; codemirror console
 
@@ -74,9 +67,14 @@
 
 (re-frame/register-handler
  :console/read-prompt
- (fn [{:keys [buffer-lines prompt] :as db} _]
+ (fn [{:keys [prompt] :as db} _]
    (let [cm (:console db)]
-     (let [input-range-js (.find (last (.getAllMarks cm)))
+     (let [ input-range-js
+           (some
+            (fn [m]
+              (when (= "re-pl-input" (.-className m))
+                (.find m)))
+            (.getAllMarks cm))
 
            from #js {:line (-> input-range-js .-from .-line)
                      :ch (-> input-range-js .-from .-ch)}
@@ -87,28 +85,45 @@
            input (.getRange cm from to)
 
            cpos (.getCursor cm)
-           c-line (.-line cpos)]
-       (if (< (dec buffer-lines) c-line)
-         (do
+           c-line (.-line cpos)
+           c-ch (.-ch cpos)]
+       (when (and (<= (.-line from) c-line)
+                  (<= (.-ch from) c-ch))
            (re-frame/dispatch
             [:read-eval-call
-             input])
-           db)
-         db)))))
+             input]))
+       db))))
 
 
 (re-frame/register-handler
- :console/write-line
- (fn [{:keys [console] :as db} [_ line]]
+ :console/write
+ (fn [{:keys [console] :as db} [_ text]]
    (if console
-     (let [line-count (.lineCount console)]
+     (let [last-line (.lastLine console)]
        (.replaceRange console
-                      (str "\n" line)
-                      #js {:line line-count
+                      text
+                      #js {:line (inc last-line)
                            :ch 0})
-       (update db :buffer-lines inc))
+       db)
      (throw (js/Error. "No console!")))))
 
+(comment
+  (defn enable-console-print!
+  "Set *print-fn* to console.log"
+  []
+  (set! *print-newline* false)
+  (set! *print-fn*
+        (fn [& args]
+          (.apply (.-log js/console) js/console (into-array args))))
+  (set! *print-err-fn*
+        (fn [& args]
+          (.apply (.-error js/console) js/console (into-array args))))
+  nil))
+
+(re-frame/register-handler
+ :console/print
+ (fn [db [_ message]]
+   db))
 
 
 (defn clear-marks! [cm]
@@ -176,11 +191,8 @@
          (.setCursor #js {:line (cond-> last-line
                                   after-eval? inc)}))
 
-       ;; set the app state to input, also
-       ;; tell the app about new lines if we have them
-       (cond-> (assoc db :state :input)
-         (= :eval state)
-         (update :buffer-lines inc)))
+       ;; set the app state to input
+       (assoc db :state :input))
      (do
        ;; redispatch until app is ready
        (re-frame/dispatch
