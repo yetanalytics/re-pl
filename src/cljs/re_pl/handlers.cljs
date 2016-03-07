@@ -4,6 +4,7 @@
               [re-pl.repl :refer [get-prompt
                                   read-eval-call]]
               [re-pl.console :refer [get-input
+                                     set-input
                                      clear-marks!
                                      mark-buffer]]
               [clojure.string :as str]))
@@ -42,7 +43,13 @@
    (read-eval-call
     #(re-frame/dispatch [:store-result %])
     input-str)
-   (assoc db :state :eval)))
+   (-> db
+       (assoc :state :eval)
+       (update :history conj input-str)
+       (assoc :history-pos 0))))
+
+
+
 
 ;; codemirror console
 
@@ -63,8 +70,10 @@
                     :matchBrackets true
                     :autoCloseBrackets true
                     :lineNumbers false
-                    :extraKeys {:Enter
-                                #(re-frame/dispatch [:console/read-prompt])}}
+                    :extraKeys {"Enter"
+                                #(re-frame/dispatch [:console/read-prompt])
+                                "Ctrl-Up" #(re-frame/dispatch [:history/prev])
+                                "Ctrl-Down" #(re-frame/dispatch [:history/next])}}
                    opts)))]
          (do
            (set! *print-newline* false)
@@ -172,3 +181,31 @@
        (re-frame/dispatch
         [:console/prompt!])
        db))))
+
+
+;; history
+
+(re-frame/register-handler
+ :history/prev
+ (fn [{:keys [history history-pos console] :as db} _]
+   (if (> (count history) history-pos)
+     (let [current-input (get-input console)
+           history-item (nth history history-pos)]
+
+       (set-input console history-item)
+
+       (cond-> (update db :history-pos inc)
+         (= 0 history-pos) (assoc :history-swap current-input)))
+     db)))
+
+(re-frame/register-handler
+ :history/next
+ (fn [{:keys [history history-pos console history-swap] :as db} _]
+   (if (= 0 history-pos)
+     db
+     (do
+       (set-input console
+                  (if (= 0 (dec history-pos))
+                    history-swap
+                    (nth history (- history-pos 2))))
+       (update db :history-pos dec)))))

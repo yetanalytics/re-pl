@@ -17,6 +17,21 @@
         input (.getRange cm from to)]
     input))
 
+(defn set-input [cm input-str]
+  (let [input-range-js
+        (some
+         (fn [m]
+           (when (= "re-pl-input" (.-className m))
+             (.find m)))
+         (.getAllMarks cm))
+
+        from #js {:line (-> input-range-js .-from .-line)
+                  :ch (-> input-range-js .-from .-ch)}
+
+        to #js {:line (-> input-range-js .-to .-line)
+                :ch (-> input-range-js .-to .-ch)}]
+    (.replaceRange cm input-str from to)))
+
 (defn clear-marks! [cm]
   (doseq [mark (.getAllMarks cm)]
     (.clear mark)))
