@@ -1,6 +1,7 @@
 (ns re-pl.views
   (:require [re-frame.core :as re-frame]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [re-pl.config :refer [debug?]]))
 
 
 (def console
@@ -8,9 +9,9 @@
    {:reagent-render
     (fn []
       [:textarea
-       {:default-value ""
-        :auto-complete "off"
-        }])
+       (cond-> {:default-value ""
+                :auto-complete "off"}
+         (not debug?) (assoc :style {:display "none"}))])
     :component-did-mount
     (fn [this]
       (re-frame/dispatch [:console/init
@@ -18,5 +19,6 @@
                           {}]))}))
 
 (defn main-panel []
-  [:div
-   [console]])
+  (let [dump (re-frame/subscribe [:debug/dump])]
+    (fn []
+      [console])))

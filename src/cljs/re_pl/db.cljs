@@ -5,4 +5,6 @@
    :results-data (list) ;; raw repl output
    :buffer ";; Welcome to re-pl!" ;; string containing buffer as text
    ;; :console nil
+   :state :init ;; enum #{:init :input :eval}
+   :buffer-lines 0
    })

@@ -2,7 +2,6 @@ body {
   background: #272822;
 }
 
-.re-pl-prompt {
-  float: left;
-  margin-right: -10px;
+.debug {
+  color: white;
 }
