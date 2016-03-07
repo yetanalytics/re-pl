@@ -4,12 +4,26 @@
             [re-pl.config :refer [debug?]]))
 
 
+(defonce welcome-text
+  (apply
+   str
+   (into []
+         (interpose "\n")
+         [";; Welcome to re-pl!"
+          ";;"
+          ";; Key Bindings:"
+          ";;   Enter: evaluate!"
+          ";;   Ctrl-Up/Down: history"
+          ";;   Other: CodeMirror Emacs bindings"
+          " "])))
+
 (def console
   (r/create-class
    {:reagent-render
     (fn []
       [:textarea
-       (cond-> {:default-value ""
+       (cond-> {:default-value
+                welcome-text
                 :auto-complete "off"}
          (not debug?) (assoc :style {:display "none"}))])
     :component-did-mount
