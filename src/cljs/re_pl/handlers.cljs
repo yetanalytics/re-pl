@@ -3,6 +3,9 @@
               [re-pl.db :as db]
               [re-pl.repl :refer [get-prompt
                                   read-eval-call]]
+              [re-pl.console :refer [get-input
+                                     clear-marks!
+                                     mark-buffer]]
               [clojure.string :as str]))
 
 (re-frame/register-handler
@@ -74,34 +77,15 @@
            )
          (assoc db :console cm))))))
 
+
 (re-frame/register-handler
  :console/read-prompt
  (fn [{:keys [prompt] :as db} _]
    (let [cm (:console db)]
-     (let [ input-range-js
-           (some
-            (fn [m]
-              (when (= "re-pl-input" (.-className m))
-                (.find m)))
-            (.getAllMarks cm))
-
-           from #js {:line (-> input-range-js .-from .-line)
-                     :ch (-> input-range-js .-from .-ch)}
-
-           to #js {:line (-> input-range-js .-to .-line)
-                   :ch (-> input-range-js .-to .-ch)}
-
-           input (.getRange cm from to)
-
-           cpos (.getCursor cm)
-           c-line (.-line cpos)
-           c-ch (.-ch cpos)]
-       (when (and (<= (.-line from) c-line)
-                  (<= (.-ch from) c-ch))
-           (re-frame/dispatch
-            [:read-eval-call
-             input]))
-       db))))
+     (re-frame/dispatch
+      [:read-eval-call
+       (get-input cm)])
+     db)))
 
 
 (re-frame/register-handler
@@ -131,21 +115,6 @@
                              ]))))
    db))
 
-
-(defn clear-marks! [cm]
-  (doseq [mark (.getAllMarks cm)]
-    (.clear mark)))
-
-(defn mark-buffer [cm]
-  (let [last-line (.lastLine cm)]
-    (doto cm
-        (.markText
-         #js {:line 0
-              :ch 0}
-         #js {:line last-line}
-         #js {:className "re-pl-buffer"
-              :readOnly true}))))
-;
 (re-frame/register-handler
  :console/prompt!
  (fn [{:keys [console prompt state] :as db} [_ ?force-newline]]
