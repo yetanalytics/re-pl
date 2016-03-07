@@ -120,8 +120,7 @@
                       #js {:line (inc last-line)
                            :ch 0})
        (when (#{:init :input} state)
-         (re-frame/dispatch [:console/prompt! true ;; force a newline
-                             ]))))
+         (re-frame/dispatch [:console/prompt!]))))
    db))
 
 (re-frame/register-handler
@@ -129,50 +128,43 @@
  (fn [{:keys [console prompt state] :as db} [_ ?force-newline]]
    (if (and console prompt)
      (let [last-line (.lastLine console)
-           new-line? (or (= :eval state) ?force-newline) ;; will be true if this isn't the first prompt
-           ;; escaped-prompt (str prompt space)
-           ]
+           prompt-line (inc last-line)]
        (doto console
          ;; clear all doc marks
          clear-marks!
 
          ;; if there is a buffer, make it read-only
-         (cond-> new-line? mark-buffer)
+         ;; (cond-> new-line? mark-buffer)
+         mark-buffer
 
          ;; add the prompt
          (.replaceRange
           (str
-           (when new-line?
-             "\n")
+           "\n"
            prompt)
           #js {:line last-line}) ;; no ch means EOL
 
          ;; mark prompt
          (.markText
-          #js {:line (cond-> last-line
-                       new-line? inc)
+          #js {:line prompt-line
                :ch 0}
-          #js {:line (cond-> last-line
-                       new-line? inc)
+          #js {:line prompt-line
                :ch (count prompt)}
           #js {:className "re-pl-prompt"
                :readOnly true})
 
          ;; mark input, this will be the last mark
          (.markText
-          #js {:line (cond-> last-line
-                       new-line? inc)
+          #js {:line prompt-line
                :ch (inc (count prompt))}
-          #js {:line (inc (cond-> last-line
-                       new-line? inc))}
+          #js {:line prompt-line}
           #js {:className "re-pl-input"
                :clearWhenEmpty false
                :inclusiveLeft true
                :inclusiveRight true})
 
          ;; set the cursor to eol
-         (.setCursor #js {:line (cond-> last-line
-                                  new-line? inc)}))
+         (.setCursor #js {:line prompt-line}))
 
        ;; set the app state to input
        (assoc db :state :input))
