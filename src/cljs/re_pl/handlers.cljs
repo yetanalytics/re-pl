@@ -172,8 +172,9 @@
 
 (re-frame/register-handler
  :history/prev
- (fn [{:keys [history history-pos console] :as db} _]
-   (if (> (count history) history-pos)
+ (fn [{:keys [state history history-pos console] :as db} _]
+   (if (and (= state :input)
+           (> (count history) history-pos))
      (let [current-input (get-input console)
            history-item (nth history history-pos)]
 
@@ -185,8 +186,9 @@
 
 (re-frame/register-handler
  :history/next
- (fn [{:keys [history history-pos console history-swap] :as db} _]
-   (if (= 0 history-pos)
+ (fn [{:keys [state history history-pos console history-swap] :as db} _]
+   (if (or (= state :eval)
+           (= 0 history-pos))
      db
      (do
        (set-input console
