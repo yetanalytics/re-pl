@@ -3,7 +3,7 @@
    cljsjs.codemirror
    cljsjs.codemirror.mode.clojure
    cljsjs.codemirror.keymap.emacs
-
+   cljsjs.codemirror.addon.hint.show-hint
    cljsjs.codemirror.addon.edit.closebrackets
    cljsjs.codemirror.addon.edit.matchbrackets
    datascript.core
@@ -12,7 +12,10 @@
    [re-pl.handlers]
    [re-pl.subs]
    [re-pl.views :as views]
-   [re-pl.config :as config]))
+   [re-pl.config :as config]
+   ))
+
+
 
 (when config/debug?
   (println "dev mode"))

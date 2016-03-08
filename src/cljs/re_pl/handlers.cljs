@@ -2,13 +2,15 @@
     (:require [re-frame.core :as re-frame]
               [re-pl.db :as db]
               [re-pl.repl :refer [get-prompt
-                                  read-eval-call]]
+                                  read-eval-call
+                                  autocomplete-terms]]
               [re-pl.console :refer [new-console
                                      append
                                      reprompt
                                      get-input
                                      set-input
-                                     clear-marks!]]
+                                     clear-marks!
+                                     show-hint]]
               [clojure.string :as str]))
 
 (re-frame/register-handler
@@ -56,7 +58,8 @@
                    :extraKeys {"Enter"
                                #(re-frame/dispatch [:console/read-prompt])
                                "Ctrl-Up" #(re-frame/dispatch [:history/prev])
-                               "Ctrl-Down" #(re-frame/dispatch [:history/next])}}
+                               "Ctrl-Down" #(re-frame/dispatch [:history/next])
+                               "Tab" #(re-frame/dispatch [:console/hint])}}
                   opts))]
          ;; switch printing to repl
          (do
@@ -126,6 +129,20 @@
         [:console/prompt!])
        db))))
 
+(re-frame/register-handler
+ :console/hint
+ (fn [{:keys [history] :as db} _]
+   (let [cm (:console db)](show-hint
+    cm
+    {:hint (fn [cm opts]
+
+             (-> js/CodeMirror
+                 .-hint
+                 (.fromList cm
+                            (clj->js
+                             (merge (js->clj opts)
+                                    {:words (autocomplete-terms)})))))})
+   db)))
 
 ;; history
 

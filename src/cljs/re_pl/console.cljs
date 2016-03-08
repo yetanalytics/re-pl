@@ -1,5 +1,12 @@
 (ns re-pl.console)
 
+(defn new-pos
+  [line ch]
+  (js/CodeMirror.Pos. line ch))
+
+(defn show-hint [cm clj-opts]
+  (.showHint cm (clj->js clj-opts)))
+
 (defn find-mark-range
   "find a CodeMirror marked range by a single string classname."
   [cm mark-class]
@@ -76,8 +83,6 @@
     (.replaceRange
      cm input-str
      (clj->js from) (clj->js to))))
-
-
 
 
 (defn reprompt

@@ -2,7 +2,10 @@
   (:require
    [replumb.core :as replumb]
    [replumb.browser :as browser]
-   [replumb.load :as load]))
+   [replumb.load :as load]
+   [replumb.ast :as ast]
+   [replumb.repl :refer [st current-ns]]
+   ))
 
 (defn read-eval-call [result-cb user-str]
   (replumb/read-eval-call
@@ -14,3 +17,16 @@
 
 (defn get-prompt []
   (replumb/get-prompt))
+
+(defn autocomplete-terms []
+  (let [state @st
+        nss (ast/known-namespaces state)]
+
+    (into
+     []
+     (apply
+      concat
+      (for [ns nss]
+        (into [(str ns)]
+              (map (comp str first))
+              (ast/ns-defs state ns)))))))
