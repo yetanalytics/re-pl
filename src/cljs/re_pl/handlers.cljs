@@ -101,7 +101,7 @@
 
      db)))
 
-;
+
 (re-frame/register-handler
  :console/print
  (fn [{:keys [console state] :as db} [_ message]]
