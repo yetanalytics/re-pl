@@ -55,6 +55,7 @@
                    :matchBrackets true
                    :autoCloseBrackets true
                    :lineNumbers false
+                   :lineWrapping true
                    :extraKeys {"Enter"
                                #(re-frame/dispatch [:console/read-prompt])
                                "Ctrl-Up" #(re-frame/dispatch [:history/prev])
