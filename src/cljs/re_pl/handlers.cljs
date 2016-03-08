@@ -26,30 +26,17 @@
  :store-result
  (fn [{:keys [prompt console] :as db} [_ {:keys [value form error warning] :as result}]]
 
-   (when console
-     (when warning
-       (re-frame/dispatch [:console/write (str "\n" warning)]))
-     (re-frame/dispatch [:console/write (str "\n" (or value error))])
-     (re-frame/dispatch
-      [:console/prompt!]))
+   (when warning
+     (re-frame/dispatch [:console/write (str "\n" warning)]))
+
+   (re-frame/dispatch [:console/write (str "\n" (or value error))])
+
+   (re-frame/dispatch
+    [:console/prompt!])
 
    (-> db
        (assoc :prompt (get-prompt))
        (update :results-data conj result))))
-
-;; eval a string
-(re-frame/register-handler
- :read-eval-call
- (fn [db [_ input-str]]
-   (read-eval-call
-    #(re-frame/dispatch [:store-result %])
-    input-str)
-   (-> db
-       (assoc :state :eval)
-       (update :history conj input-str)
-       (assoc :history-pos 0))))
-
-
 
 
 ;; codemirror console
@@ -74,6 +61,7 @@
                                "Ctrl-Up" #(re-frame/dispatch [:history/prev])
                                "Ctrl-Down" #(re-frame/dispatch [:history/next])}}
                   opts))]
+         ;; switch printing to repl
          (do
            (set! *print-newline* false)
            (set! *print-fn*
@@ -88,12 +76,18 @@
 
 (re-frame/register-handler
  :console/read-prompt
- (fn [{:keys [prompt] :as db} _]
-   (let [cm (:console db)]
-     (re-frame/dispatch
-      [:read-eval-call
-       (get-input cm)])
-     db)))
+ (fn [{:keys [prompt console] :as db} _]
+
+   (let [input-str (str (get-input console))]
+     ;; eval the form
+     (read-eval-call
+      #(re-frame/dispatch [:store-result %])
+      input-str)
+
+     (-> db
+         (assoc :state :eval)
+         (update :history conj input-str)
+         (assoc :history-pos 0)))))
 
 
 (re-frame/register-handler
