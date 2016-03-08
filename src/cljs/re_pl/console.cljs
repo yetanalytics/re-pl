@@ -10,6 +10,18 @@
    (clj->js
     clj-opts)))
 
+
+(defn append
+  "Append a string to the console"
+  [cm s & [newline?]]
+  (let [last-line (.lastLine cm)]
+    (.replaceRange cm
+                   (str
+                    (when newline? "\n")
+                    s)
+                   #js {:line last-line})))
+
+
 (defn get-input [cm]
   (let [input-range-js
         (some
@@ -55,3 +67,47 @@
        #js {:line last-line}
        #js {:className "re-pl-buffer"
             :readOnly true}))))
+
+
+(defn reprompt
+  "Regroup all text into a read-only marker,
+   and reprompt the user"
+  [cm prompt]
+  (let [last-line (.lastLine cm)
+        prompt-line (inc last-line)]
+    (doto cm
+      ;; clear all doc marks
+      clear-marks!
+
+      ;; if there is a buffer, make it read-only
+      ;; (cond-> new-line? mark-buffer)
+      mark-buffer
+
+      ;; add the prompt
+      (.replaceRange
+       (str
+        "\n"
+        prompt)
+       #js {:line last-line}) ;; no ch means EOL
+
+      ;; mark prompt
+      (.markText
+       #js {:line prompt-line
+            :ch 0}
+       #js {:line prompt-line
+            :ch (count prompt)}
+       #js {:className "re-pl-prompt"
+            :readOnly true})
+
+      ;; mark input, this will be the last mark
+      (.markText
+       #js {:line prompt-line
+            :ch (inc (count prompt))}
+       #js {:line prompt-line}
+       #js {:className "re-pl-input"
+            :clearWhenEmpty false
+            :inclusiveLeft true
+            :inclusiveRight true})
+
+      ;; set the cursor to eol
+      (.setCursor #js {:line prompt-line}))))

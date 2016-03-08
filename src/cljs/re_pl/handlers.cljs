@@ -4,6 +4,8 @@
               [re-pl.repl :refer [get-prompt
                                   read-eval-call]]
               [re-pl.console :refer [new-console
+                                     append
+                                     reprompt
                                      get-input
                                      set-input
                                      clear-marks!
@@ -26,10 +28,9 @@
  :store-result
  (fn [{:keys [prompt console] :as db} [_ {:keys [value form error warning] :as result}]]
 
-   (when warning
-     (re-frame/dispatch [:console/write (str "\n" warning)]))
-
-   (re-frame/dispatch [:console/write (str "\n" (or value error))])
+   (doto console
+     (cond-> warning (append (str warning) true))
+     (append (str (or value error)) true))
 
    (re-frame/dispatch
     [:console/prompt!])
@@ -69,8 +70,7 @@
                    (re-frame/dispatch [:console/print (apply str args)])))
            (set! *print-err-fn*
                  (fn [& args]
-                   (re-frame/dispatch [:console/print (apply str args)])))
-           )
+                   (re-frame/dispatch [:console/print (apply str args)]))))
          (assoc db :console cm))))))
 
 
@@ -93,14 +93,9 @@
 (re-frame/register-handler
  :console/write
  (fn [{:keys [console] :as db} [_ text]]
-   (if console
-     (let [last-line (.lastLine console)]
-       (.replaceRange console
-                      text
-                      #js {:line (inc last-line)
-                           :ch 0})
-       db)
-     (throw (js/Error. "No console!")))))
+
+   (append console text)
+   db))
 
 ;
 (re-frame/register-handler
@@ -118,46 +113,10 @@
 
 (re-frame/register-handler
  :console/prompt!
- (fn [{:keys [console prompt state] :as db} [_ ?force-newline]]
+ (fn [{:keys [console prompt state] :as db} _]
    (if (and console prompt)
-     (let [last-line (.lastLine console)
-           prompt-line (inc last-line)]
-       (doto console
-         ;; clear all doc marks
-         clear-marks!
-
-         ;; if there is a buffer, make it read-only
-         ;; (cond-> new-line? mark-buffer)
-         mark-buffer
-
-         ;; add the prompt
-         (.replaceRange
-          (str
-           "\n"
-           prompt)
-          #js {:line last-line}) ;; no ch means EOL
-
-         ;; mark prompt
-         (.markText
-          #js {:line prompt-line
-               :ch 0}
-          #js {:line prompt-line
-               :ch (count prompt)}
-          #js {:className "re-pl-prompt"
-               :readOnly true})
-
-         ;; mark input, this will be the last mark
-         (.markText
-          #js {:line prompt-line
-               :ch (inc (count prompt))}
-          #js {:line prompt-line}
-          #js {:className "re-pl-input"
-               :clearWhenEmpty false
-               :inclusiveLeft true
-               :inclusiveRight true})
-
-         ;; set the cursor to eol
-         (.setCursor #js {:line prompt-line}))
+     (do
+       (reprompt console prompt)
 
        ;; set the app state to input
        (assoc db :state :input))
