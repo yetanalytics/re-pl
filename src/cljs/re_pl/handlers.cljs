@@ -3,7 +3,8 @@
               [re-pl.db :as db]
               [re-pl.repl :refer [get-prompt
                                   read-eval-call]]
-              [re-pl.console :refer [get-input
+              [re-pl.console :refer [new-console
+                                     get-input
                                      set-input
                                      clear-marks!
                                      mark-buffer]]
@@ -59,22 +60,20 @@
    (let [cmi (:console db)]
      (if cmi
        db
-       (let [cm (.fromTextArea
-                 js/CodeMirror
+       (let [cm (new-console
                  el
-                 (clj->js
-                  (merge
-                   {:mode "clojure"
-                    :keyMap "emacs"
-                    :theme "monokai"
-                    :matchBrackets true
-                    :autoCloseBrackets true
-                    :lineNumbers false
-                    :extraKeys {"Enter"
-                                #(re-frame/dispatch [:console/read-prompt])
-                                "Ctrl-Up" #(re-frame/dispatch [:history/prev])
-                                "Ctrl-Down" #(re-frame/dispatch [:history/next])}}
-                   opts)))]
+                 (merge
+                  {:mode "clojure"
+                   :keyMap "emacs"
+                   :theme "monokai"
+                   :matchBrackets true
+                   :autoCloseBrackets true
+                   :lineNumbers false
+                   :extraKeys {"Enter"
+                               #(re-frame/dispatch [:console/read-prompt])
+                               "Ctrl-Up" #(re-frame/dispatch [:history/prev])
+                               "Ctrl-Down" #(re-frame/dispatch [:history/next])}}
+                  opts))]
          (do
            (set! *print-newline* false)
            (set! *print-fn*

@@ -1,5 +1,15 @@
 (ns re-pl.console)
 
+
+(defn new-console
+  "return a new codemirror editor"
+  [textarea clj-opts]
+  (.fromTextArea
+   js/CodeMirror
+   textarea
+   (clj->js
+    clj-opts)))
+
 (defn get-input [cm]
   (let [input-range-js
         (some
