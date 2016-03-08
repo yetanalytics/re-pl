@@ -26,14 +26,10 @@
 ;; handle eval result
 (re-frame/register-handler
  :store-result
- (fn [{:keys [prompt console] :as db} [_ {:keys [value form error warning] :as result}]]
-
-   (doto console
-     (cond-> warning (append (str warning) true))
-     (append (str (or value error)) true))
+ (fn [db [_ {:keys [value form error warning] :as result}]]
 
    (re-frame/dispatch
-    [:console/prompt!])
+    [:console/write-result])
 
    (-> db
        (assoc :prompt (get-prompt))
@@ -91,25 +87,28 @@
 
 
 (re-frame/register-handler
- :console/write
- (fn [{:keys [console] :as db} [_ text]]
+ :console/write-result
+ (fn [{:keys [console results-data] :as db} _]
+   (let [{:keys [value form error warning] :as result} (peek results-data)]
 
-   (append console text)
-   db))
+     (doto console
+       (cond-> warning (append (str warning) true))
+       (append (str (or value error)) true))
+
+     (re-frame/dispatch [:console/prompt!])
+
+     db)))
 
 ;
 (re-frame/register-handler
  :console/print
  (fn [{:keys [console state] :as db} [_ message]]
    (when console
-     (let [last-line (.lastLine console)]
-       (.replaceRange console
-                      (str "\n" message)
-                      #js {:line (inc last-line)
-                           :ch 0})
-       (when (#{:init :input} state)
-         (re-frame/dispatch [:console/prompt!]))))
+     (append console message true)
+     (when (#{:init :input} state)
+       (re-frame/dispatch [:console/prompt!])))
    db))
+
 
 (re-frame/register-handler
  :console/prompt!
