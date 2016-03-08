@@ -22,37 +22,33 @@
                    #js {:line last-line})))
 
 
+(defn find-mark-range [cm mark-class]
+  (let [js-range (some
+                  (fn [m]
+                    (when (= mark-class (.-className m))
+                      (.find m)))
+                  (.getAllMarks cm))
+
+        from-line (-> js-range .-from .-line)
+        from-ch (-> js-range .-from .-ch)
+        to-line (-> js-range .-to .-line)
+        to-ch (-> js-range .-to .-ch)]
+    {:from {:line from-line
+            :ch from-ch}
+     :to {:line to-line
+          :ch to-ch}}))
+
 (defn get-input [cm]
-  (let [input-range-js
-        (some
-         (fn [m]
-           (when (= "re-pl-input" (.-className m))
-             (.find m)))
-         (.getAllMarks cm))
-
-        from #js {:line (-> input-range-js .-from .-line)
-                  :ch (-> input-range-js .-from .-ch)}
-
-        to #js {:line (-> input-range-js .-to .-line)
-                :ch (-> input-range-js .-to .-ch)}
-
-        input (.getRange cm from to)]
-    input))
+  (let [{:keys [from to]} (find-mark-range cm "re-pl-input")]
+    (.getRange
+     cm
+     (clj->js from) (clj->js to))))
 
 (defn set-input [cm input-str]
-  (let [input-range-js
-        (some
-         (fn [m]
-           (when (= "re-pl-input" (.-className m))
-             (.find m)))
-         (.getAllMarks cm))
-
-        from #js {:line (-> input-range-js .-from .-line)
-                  :ch (-> input-range-js .-from .-ch)}
-
-        to #js {:line (-> input-range-js .-to .-line)
-                :ch (-> input-range-js .-to .-ch)}]
-    (.replaceRange cm input-str from to)))
+  (let [{:keys [from to]} (find-mark-range cm "re-pl-input")]
+    (.replaceRange
+     cm input-str
+     (clj->js from) (clj->js to))))
 
 (defn clear-marks! [cm]
   (doseq [mark (.getAllMarks cm)]
