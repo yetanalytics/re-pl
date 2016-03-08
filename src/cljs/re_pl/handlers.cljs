@@ -47,7 +47,8 @@
        (let [cm (new-console
                  el
                  (merge
-                  {:mode "clojure"
+                  {:autofocus true
+                   :mode "clojure"
                    :keyMap "emacs"
                    :theme "monokai"
                    :matchBrackets true
