@@ -14,6 +14,7 @@
           ";; Key Bindings:"
           ";;   Enter: evaluate!"
           ";;   Ctrl-Up/Down: history"
+          ";;   Tab: autocomplete"
           ";;   Other: CodeMirror Emacs bindings"
           " "])))
 
