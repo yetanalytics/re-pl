@@ -4,7 +4,7 @@ Try the [live demo](http://yetanalytics.github.io/re-pl/)!
 
 A toy [re-frame](https://github.com/Day8/re-frame) application that presents the user with a [bootstrapped cljs](https://github.com/clojure/clojurescript/wiki/Bootstrapping-the-Compiler) repl.
 
-Uses [re-plumb](https://github.com/Lambda-X/replumb) to make read/eval super easy, and [CodeMirror](https://codemirror.net/) for editing/highlighting.
+Uses [replumb](https://github.com/Lambda-X/replumb) to make read/eval super easy, and [CodeMirror](https://codemirror.net/) for editing/highlighting.
 
 ## Development Mode
 
