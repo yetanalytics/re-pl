@@ -91,9 +91,11 @@
  (fn [{:keys [console results-data] :as db} _]
    (let [{:keys [value form error warning] :as result} (peek results-data)]
 
-     (doto console
-       (cond-> warning (append (str warning) true))
-       (append (str (or value error)) true))
+     (.operation
+      console
+      #(doto console
+         (cond-> warning (append (str warning) true))
+         (append (str (or value error)) true)))
 
      (re-frame/dispatch [:console/prompt!])
 
