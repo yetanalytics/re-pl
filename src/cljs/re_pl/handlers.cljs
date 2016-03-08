@@ -8,8 +8,7 @@
                                      reprompt
                                      get-input
                                      set-input
-                                     clear-marks!
-                                     mark-buffer]]
+                                     clear-marks!]]
               [clojure.string :as str]))
 
 (re-frame/register-handler
