@@ -73,7 +73,6 @@
 (re-frame/register-handler
  :console/read-prompt
  (fn [{:keys [prompt console] :as db} _]
-
    (let [input-str (str (get-input console))]
      ;; eval the form
      (read-eval-call

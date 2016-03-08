@@ -71,7 +71,7 @@
 
 (defn reprompt
   "Regroup all text into a read-only marker,
-   and reprompt the user"
+   and prompt the user"
   [cm prompt]
   (let [last-line (.lastLine cm)
         prompt-line (inc last-line)]
