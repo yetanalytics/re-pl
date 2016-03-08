@@ -20,13 +20,20 @@
 
 (defn autocomplete-terms []
   (let [state @st
-        nss (ast/known-namespaces state)]
-
+        nss (ast/known-namespaces state)
+        current-ns (current-ns)]
     (into
      []
-     (apply
-      concat
-      (for [ns nss]
-        (into [(str ns)]
-              (map (comp str first))
-              (ast/ns-defs state ns)))))))
+     (map str)
+
+     (concat
+      (-> (ast/namespace state current-ns)
+          :cljs.analyzer/constants
+          :seen
+          seq)
+      (apply
+       concat
+       (for [ns nss]
+         (into [ns]
+               (map first)
+               (ast/ns-defs state ns))))))))
