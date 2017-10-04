@@ -3,13 +3,13 @@
     (:require [re-frame.core :as re-frame]))
 
 
-(re-frame/register-sub
+(re-frame/reg-sub-raw
  :results
  (fn [db]
    (reaction (:results-data @db))))
 
 
-(re-frame/register-sub
+(re-frame/reg-sub-raw
  :debug/dump
  (fn [db]
    (reaction @db)))

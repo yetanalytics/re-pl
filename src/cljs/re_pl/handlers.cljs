@@ -13,19 +13,19 @@
                                      show-hint]]
               [clojure.string :as str]))
 
-(re-frame/register-handler
+(re-frame/reg-event-db
  :initialize-db
  (fn  [_ _]
    db/default-db))
 
 ;; repl prompt
-(re-frame/register-handler
+(re-frame/reg-event-db
  :update-prompt!
  (fn [db _]
    (assoc db :prompt (get-prompt))))
 
 ;; handle eval result
-(re-frame/register-handler
+(re-frame/reg-event-db
  :store-result
  (fn [db [_ {:keys [value form error warning] :as result}]]
 
@@ -39,7 +39,7 @@
 
 ;; codemirror console
 
-(re-frame/register-handler
+(re-frame/reg-event-db
  :console/init
  (fn [db [_ el opts]]
    (let [cmi (:console db)]
@@ -74,7 +74,7 @@
          (assoc db :console cm))))))
 
 
-(re-frame/register-handler
+(re-frame/reg-event-db
  :console/read-prompt
  (fn [{:keys [prompt console] :as db} _]
    (let [input-str (str (get-input console))]
@@ -89,7 +89,7 @@
          (assoc :history-pos 0)))))
 
 
-(re-frame/register-handler
+(re-frame/reg-event-db
  :console/write-result
  (fn [{:keys [console results-data] :as db} _]
    (let [{:keys [value form error warning] :as result} (peek results-data)]
@@ -105,7 +105,7 @@
      db)))
 
 
-(re-frame/register-handler
+(re-frame/reg-event-db
  :console/print
  (fn [{:keys [console state] :as db} [_ message]]
    (when console
@@ -115,7 +115,7 @@
    db))
 
 
-(re-frame/register-handler
+(re-frame/reg-event-db
  :console/prompt!
  (fn [{:keys [console prompt state] :as db} _]
    (if (and console prompt)
@@ -130,7 +130,7 @@
         [:console/prompt!])
        db))))
 
-(re-frame/register-handler
+(re-frame/reg-event-db
  :console/hint
  (fn [{:keys [history] :as db} _]
    (let [cm (:console db)](show-hint
@@ -147,7 +147,7 @@
 
 ;; history
 
-(re-frame/register-handler
+(re-frame/reg-event-db
  :history/prev
  (fn [{:keys [state history history-pos console] :as db} _]
    (if (and (= state :input)
@@ -161,7 +161,7 @@
          (= 0 history-pos) (assoc :history-swap current-input)))
      db)))
 
-(re-frame/register-handler
+(re-frame/reg-event-db
  :history/next
  (fn [{:keys [state history history-pos console history-swap] :as db} _]
    (if (or (= state :eval)
