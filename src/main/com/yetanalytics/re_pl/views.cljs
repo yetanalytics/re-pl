@@ -1,7 +1,7 @@
-(ns re-pl.views
+(ns com.yetanalytics.re-pl.views
   (:require [re-frame.core :as re-frame]
             [reagent.core :as r]
-            [re-pl.config :refer [debug?]]))
+            [com.yetanalytics.re-pl.config :refer [debug?]]))
 
 
 (defonce welcome-text

@@ -1,10 +1,10 @@
-(ns re-pl.handlers
+(ns com.yetanalytics.re-pl.handlers
     (:require [re-frame.core :as re-frame]
-              [re-pl.db :as db]
-              [re-pl.repl :refer [get-prompt
+              [com.yetanalytics.re-pl.db :as db]
+              [com.yetanalytics.re-pl.repl :refer [get-prompt
                                   read-eval-call
                                   autocomplete-terms]]
-              [re-pl.console :refer [new-console
+              [com.yetanalytics.re-pl.console :refer [new-console
                                      append
                                      reprompt
                                      get-input

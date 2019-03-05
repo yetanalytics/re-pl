@@ -1,0 +1,4 @@
+^{:watch-dirs ["src/test" "src/main"]
+  :css-dirs ["resources/public/css"]
+  :auto-testing false}
+{:main com.yetanalytics.re-pl.core}

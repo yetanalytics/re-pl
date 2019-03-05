@@ -1,4 +1,4 @@
-(ns re-pl.config)
+(ns com.yetanalytics.re-pl.config)
 
 (def debug?
   ^boolean js/goog.DEBUG)

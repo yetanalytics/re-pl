@@ -1,4 +1,4 @@
-(ns re-pl.core
+(ns ^:figwheel-hooks com.yetanalytics.re-pl.core
   (:require
    cljsjs.codemirror
    cljsjs.codemirror.mode.clojure
@@ -6,13 +6,13 @@
    cljsjs.codemirror.addon.hint.show-hint
    cljsjs.codemirror.addon.edit.closebrackets
    cljsjs.codemirror.addon.edit.matchbrackets
-   datascript.core
+   ;; datascript.core
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]
-   [re-pl.handlers]
-   [re-pl.subs]
-   [re-pl.views :as views]
-   [re-pl.config :as config]
+   [com.yetanalytics.re-pl.handlers]
+   [com.yetanalytics.re-pl.subs]
+   [com.yetanalytics.re-pl.views :as views]
+   [com.yetanalytics.re-pl.config :as config]
    ))
 
 
@@ -29,3 +29,12 @@
   (re-frame/dispatch [:update-prompt!])
   (re-frame/dispatch [:console/prompt!])
   (mount-root))
+
+(defonce initial-load (init))
+
+(defn ^:after-load on-reload []
+  (mount-root)
+  ;; optionally touch your app-state to force rerendering depending on
+  ;; your application
+  ;; (swap! app-state update-in [:__figwheel_counter] inc)
+  )

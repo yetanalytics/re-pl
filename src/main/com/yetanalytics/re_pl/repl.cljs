@@ -1,4 +1,4 @@
-(ns re-pl.repl
+(ns com.yetanalytics.re-pl.repl
   (:require
    [replumb.core :as replumb]
    [replumb.browser :as browser]

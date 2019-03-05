@@ -1,4 +1,4 @@
-(ns re-pl.db)
+(ns com.yetanalytics.re-pl.db)
 
 (def default-db
   {:scratch "" ;; un-evaluated repl input

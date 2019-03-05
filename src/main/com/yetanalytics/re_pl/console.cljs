@@ -1,4 +1,4 @@
-(ns re-pl.console)
+(ns com.yetanalytics.re-pl.console)
 
 (defn new-pos
   [line ch]

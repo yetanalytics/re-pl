@@ -1,0 +1,15 @@
+{:deps {org.clojure/clojure {:mvn/version "RELEASE"}
+        org.clojure/clojurescript {:mvn/version "RELEASE"}
+        reagent {:mvn/version "0.8.1"}
+        re-frame {:mvn/version "0.10.6"}
+        replumb {:mvn/version "0.2.4"}
+        cljsjs/codemirror {:mvn/version "5.44.0-1"}
+        com.cognitect/transit-cljs {:mvn/version "0.8.256"}}
+ :paths ["src/main" "resources"]
+ :aliases {:fig {:extra-deps
+                  {com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
+                   com.bhauman/figwheel-main {:mvn/version "0.2.0"}}
+                 :extra-paths ["target" "src/test"]}
+           :build {:main-opts ["-m" "figwheel.main" "-b" "dev" "-r"]}
+           :min   {:main-opts ["-m" "figwheel.main" "-bo" "site"]}
+           :test  {:main-opts ["-m" "figwheel.main" "-co" "test.cljs.edn" "-m" dev.test-runner]}}}
