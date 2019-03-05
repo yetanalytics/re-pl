@@ -1,6 +1,6 @@
 # re-pl
 
-Try the [live demo](http://yetanalytics.github.io/re-pl/)!
+Try the [live demo](https://yetanalytics.github.io/re-pl/)!
 
 A toy [re-frame](https://github.com/Day8/re-frame) application that presents the user with a [bootstrapped cljs](https://github.com/clojure/clojurescript/wiki/Bootstrapping-the-Compiler) repl.
 
@@ -11,17 +11,17 @@ Uses [replumb](https://github.com/Lambda-X/replumb) to make read/eval super easy
 ### Run application:
 
 ```
-lein clean
-lein figwheel dev
+clj -A:fig:build
 ```
 
-Figwheel will automatically push cljs changes to the browser.
-
-Wait a bit, then browse to [http://localhost:3449](http://localhost:3449).
+Figwheel will launch a browser for interactive development.
 
 ## Production Build
 
 ```
-lein clean
-lein cljsbuild once min
+make site
 ```
+
+Copyright © 2019 Yet Analytics, Inc.
+
+Distributed under the Eclipse Public License, the same as Clojure.
