@@ -30,8 +30,6 @@
   (re-frame/dispatch [:console/prompt!])
   (mount-root))
 
-(defonce initial-load (init))
-
 (defn ^:after-load on-reload []
   (mount-root)
   ;; optionally touch your app-state to force rerendering depending on

@@ -1,0 +1,5 @@
+{:main com.yetanalytics.re-pl.core
+ :output-to "docs/cljs-out/dev-main.js"
+ :closure-defines {goog.DEBUG false}
+ :optimizations :simple
+ :parallel-build true}
